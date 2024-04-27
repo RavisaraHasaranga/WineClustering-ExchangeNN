@@ -42,6 +42,14 @@ if (!require("tidyverse")) {
   install.packages("tidyverse")
 }
 
+if (!require("fpc")) {
+  install.packages("fpc")
+}
+
+if(!require("clusrerCrit")){
+  install.packages("clusterCrit")
+}
+
 
 library(readxl)
 library(factoextra)
@@ -49,8 +57,12 @@ library(NbClust)
 library(cluster)
 library(cluster)
 library(stats)
+library(fpc)
+library(clusterCrit)
 
-##reading the dataset 
+
+
+#reading the dataset 
 whitewine<-read_excel(path="datasets/Whitewine_v6.xlsx")
 
 
@@ -145,7 +157,68 @@ plot(cumulative_proportion, type = "b",
      main = "Cumulative Score per Principal Components")
 abline(0.85,0,col="red",lty=2)
 
+#transformed dataset
+wine_transform=as.data.frame(-wine_pca$x[,1:7])
+head(wine_transform)
+
+#determining the clusters
+fviz_nbclust(wine_transform, kmeans, method="wss")
+fviz_nbclust(wine_transform,kmeans,method="silhouette")
+#fviz_nbclust(wine_transform,kmeans,method="gap_stat")
 
 
+#kmeans clustering
+kmeans_wine_transform=kmeans(wine_transform,centers = 2,nstart = 10)
+kmeans_wine_transform
+fviz_cluster(kmeans_wine_transform,data=wine_transform[,1:2], geom = "point")
+
+
+wine_centers_pca<-kmeans_wine_transform$centers
+cat("\n Cluster Centers: \n")
+print(wine_centers_pca)
+
+# Within-Cluster Sum of Squares and Total Sum of Squares
+wss_pca <- kmeans_wine_transform$tot.withinss
+cat("\n Within cluster sums of squares : \n")
+wss_pca
+
+tss_pca <- kmeans_wine_transform$totss
+cat("\n Total sum of squares: \n")
+tss_pca
+
+# Between-Cluster Sum of Squares (BSS)
+bss_pca <-kmeans_wine_transform$betweenss
+cat("\n Between-Cluster Sum of Squares: \n")
+bss_pca
+
+# Ratio of BSS/TSS
+bss_over_tss_pca <- bss_pca / tss_pca
+cat("\n Ratio between BSS/TSS: \n")
+bss_over_tss_pca
+
+#silhouette analysis
+silhouette_wine_pca<-silhouette(kmeans_wine_transform$cluster,dist(wine_subset)) 
+#need to use $cluster because just kmeans give other info
+fviz_silhouette(silhouette_wine_pca)
+
+
+#Calinski-Harabasz Index 
+ch<-calinhara(wine_transform,kmeans_wine_transform$cluster)
+cat("Calinski-Harabasz Index:", ch, "\n")
+
+fviz_ch <- function(data) {
+
+ch_index_values <- numeric(length = 10)
+for (i in 1:10) {
+  kmeans_results <- kmeans(data, centers = i, nstart = 10)
+  ch_index_values[i] <- calinhara(data, kmeans_results$cluster)
+}
+
+# Plot the CH Index values vs number of clusters
+plot(1:10, ch_index_values, type = "b", xlab = "Number of Clusters (k)", ylab = "Calinski-Harabasz Index")
+
+}
+
+fviz_ch(wine_transform)
 
 

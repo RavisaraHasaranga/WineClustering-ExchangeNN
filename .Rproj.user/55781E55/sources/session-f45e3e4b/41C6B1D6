@@ -3,9 +3,9 @@
     "path": "C:/Users/ravis/OneDrive/Desktop/modules/5DATA001C.2 Machine Learning and Data Mining/CW/whitewine.R",
     "project_path": "whitewine.R",
     "type": "r_source",
-    "hash": "2614504417",
+    "hash": "0",
     "contents": "",
-    "dirty": false,
+    "dirty": true,
     "created": 1714218299952.0,
     "source_on_save": false,
     "relative_order": 1,
@@ -13,15 +13,15 @@
         "tempName": "Untitled1",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "147,0",
-        "scrollLine": "130"
+        "cursorPosition": "223,0",
+        "scrollLine": "204"
     },
     "folds": "",
-    "lastKnownWriteTime": 1714221802,
+    "lastKnownWriteTime": 1714241886,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1714221802211,
+    "last_content_update": 1714241894622,
     "read_only": false,
     "read_only_alternatives": []
 }
