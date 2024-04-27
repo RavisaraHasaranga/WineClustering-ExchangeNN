@@ -48,7 +48,7 @@ library(factoextra)
 library(NbClust)
 library(cluster)
 library(cluster)
-
+library(stats)
 
 ##reading the dataset 
 whitewine<-read_excel(path="datasets/Whitewine_v6.xlsx")
@@ -118,6 +118,32 @@ silhouette_wine<-silhouette(kmeans_wine$cluster,dist(wine_subset))
 #need to use $cluster because just kmeans give other info
 fviz_silhouette(silhouette_wine)
 
+
+
+#pca
+wine_pca<-prcomp(wine_subset,center = TRUE,scale = TRUE)
+summary(wine_pca)
+
+#eigenvalues/eigenvectors
+eigenvalues<-(wine_pca$sdev)^2 #standard deviations (square roots of eigenvalues)
+cat("\n eigenvalues: \n")
+print(eigenvalues)
+
+eignenvectors<-wine_pca$rotation
+cat("\n eigenvectors: \n")
+print(eignenvectors)
+
+# Calculate cumulative proportion
+cumulative_proportion <- cumsum(eigenvalues)/ sum(eigenvalues)
+cat("\n Cumulative proportion: \n")
+cumulative_proportion
+
+# Plot cumulative score
+plot(cumulative_proportion, type = "b", 
+     xlab = "Number of Principal Components",
+     ylab = "Explained Varience",
+     main = "Cumulative Score per Principal Components")
+abline(0.85,0,col="red",lty=2)
 
 
 
