@@ -206,19 +206,28 @@ fviz_silhouette(silhouette_wine_pca)
 ch<-calinhara(wine_transform,kmeans_wine_transform$cluster)
 cat("Calinski-Harabasz Index:", ch, "\n")
 
+
 fviz_ch <- function(data) {
-
-ch_index_values <- numeric(length = 10)
-for (i in 1:10) {
-  kmeans_results <- kmeans(data, centers = i, nstart = 10)
-  ch_index_values[i] <- calinhara(data, kmeans_results$cluster)
-}
-
-# Plot the CH Index values vs number of clusters
-plot(1:10, ch_index_values, type = "b", xlab = "Number of Clusters (k)", ylab = "Calinski-Harabasz Index")
-
+  
+  ch_index_values <- numeric(length = 10)
+  for (i in 2:10) {
+    kmeans_results <- kmeans(data, centers = i, nstart = 10)
+    ch_index_values[i] <- calinhara(data, kmeans_results$cluster)
+  }
+  
+  # Plot the CH Index values vs number of clusters
+  plot(1:10, ch_index_values, type = "b",
+       xlab = "Number of Clusters (k)",
+       ylab = "Calinski-Harabasz Index",
+      main = "Caliński - Harabasz Plot" )
+  abline(v = 2, col = "red", lty = 2)
 }
 
 fviz_ch(wine_transform)
+
+
+
+
+
 
 
