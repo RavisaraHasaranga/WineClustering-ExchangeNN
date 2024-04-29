@@ -77,11 +77,11 @@ train<-function(architecture,train_data,test_data,activation,output){
                                               collapse = " + ")))
   
   #training the model
-  train<-neuralnet(formula,train_data,act.fct = activation, linear.output = output)
-  
+  train<-neuralnet(formula,train_data,act.fct = activation,
+                   linear.output = output,learningrate = 0.01)
   
   # Predict on test data
-  predictions <- compute(model, test_data[, -1])$net.result
+  #predictions <-neuralnet::compute(train, test_data[, -1])$net.result
   
   
 }
@@ -90,18 +90,52 @@ train<-function(architecture,train_data,test_data,activation,output){
 NN<-list()
 
 # Loop through lags, architectures, activation functions, and output types
-results <- list()
-for (i in 1:length(lag_train_data)) { 
-  for (j in 1:length(architectures)) { 
-    for (k in 1:length(activate)) { 
-      for (l in 1:length(output_layer)) { 
-        NN <- train(architectures[[j]], lag_train_data[[i]], lag_test_data[[i]], 
-                                     activate[k], output_layers[l])
-        results[[paste("lag", i, "arch", j, "act", k, "output", l)]] <- NN
-      }
+###Training for Lag 1
+for (j in 1:length(architectures)) { 
+  for (k in 1:length(activate)) {
+    for (l in 1:length(output_layer)) {
+      result <- train(architectures[[j]], lag_train_data[[1]], lag_test_data[[1]], 
+                      activate[k], output_layer[l])
+      NN[[paste("lag1", "arch", j, "act", k, "output", l)]] <- result
     }
   }
 }
+
+
+###Training for Lag 2
+for (j in 1:length(architectures)) { 
+  for (k in 1:length(activate)) { 
+    for (l in 1:length(output_layer)) { s
+      result <- train(architectures[[j]], lag_train_data[[2]], lag_test_data[[2]], 
+                      activate[k], output_layer[l])
+      NN[[paste("lag2", "arch", j, "act", k, "output", l)]] <- result
+    }
+  }
+}
+
+###Training for Lag 3
+for (j in 1:length(architectures)) {
+  for (k in 1:length(activate)) { 
+    for (l in 1:length(output_layer)) { 
+      result <- train(architectures[[j]], lag_train_data[[3]], lag_test_data[[3]], 
+                      activate[k], output_layer[l])
+      NN[[paste("lag3", "arch", j, "act", k, "output", l)]] <- result
+    }
+  }
+}
+
+###Training for Lag 4
+for (j in 1:length(architectures)) { 
+  for (k in 1:length(activate)) {
+    for (l in 1:length(output_layer)) {
+      result <- train(architectures[[j]], lag_train_data[[4]], lag_test_data[[4]], 
+                      activate[k], output_layer[l])
+      NN[[paste("lag4", "arch", j, "act", k, "output", l)]] <- result
+    }
+  }
+}
+
+
 
 
 
