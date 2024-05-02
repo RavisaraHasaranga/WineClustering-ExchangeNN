@@ -1,70 +1,15 @@
-if (!require(readxl)){
-  install.packages("readxl")
-}
-
-if (!require(tibble)){
-  install.packages("tibble")
-}
-
-if (!require(cluster)){
-  install.packages("cluster")
-}
-
-if (!require(factoextra)){
-  install.packages("factoextra")
-}
-
-if (!require(ggplot2)){
-  install.packages("ggplot2")
-}
-
-if(!require(NbClust)){
-  install.packages("NbClust")
-}
-
-if (!require("MASS")) {
-  install.packages("MASS")
-}
-
-if (!require("fpc")) {
-  install.packages("fpc")
-}
-
-if (!require("flexclust")) {
-  install.packages("flexclust")
-}
-
-if (!require("datasets")) {
-  install.packages("datasets")
-}
-
-if (!require("tidyverse")) {
-  install.packages("tidyverse")
-}
-
-if (!require("fpc")) {
-  install.packages("fpc")
-}
-
-if(!require("clusrerCrit")){
-  install.packages("clusterCrit")
-}
-
-
-library(readxl)
 library(factoextra)
 library(NbClust)
-library(cluster)
 library(cluster)
 library(stats)
 library(fpc)
 library(clusterCrit)
 
-
+library(readxl)
 
 #reading the dataset 
 whitewine<-read_excel(path="datasets/Whitewine_v6.xlsx")
-
+summary(whitewine)
 
 # Define a function to replace outliers with NA
 remove_outliers <- function(x) {
@@ -93,9 +38,20 @@ boxplot(wine_subset,outline=FALSE)
 
 
 #determining the clusters
+set.seed(123)
+
+#nbclust method
+nb<-NbClust(wine_subset,distance = "euclidean",min.nc = 2,max.nc = 10,method = "kmeans")
+
+#elbow method
 fviz_nbclust(wine_subset, kmeans, method="wss")
+
+#silhouette method
 fviz_nbclust(wine_subset,kmeans,method="silhouette")
-#fviz_nbclust(wine_subset,kmeans,method="gap_stat")
+
+#gap statistic method
+fviz_nbclust(wine_subset,kmeans,method="gap_stat",B=)
+
 
 #kmeans clustering
 kmeans_wine=kmeans(wine_subset,centers = 2,nstart = 10)
@@ -161,17 +117,23 @@ abline(0.85,0,col="red",lty=2)
 wine_transform=as.data.frame(-wine_pca$x[,1:7])
 head(wine_transform)
 
-#determining the clusters
-fviz_nbclust(wine_transform, kmeans, method="wss")
-fviz_nbclust(wine_transform,kmeans,method="silhouette")
-#fviz_nbclust(wine_transform,kmeans,method="gap_stat")
+#determining the clusters for pca
 
+#nbclust method
+nb<-NbClust(wine_transform,distance = "euclidean",min.nc = 2,max.nc = 10,method = "kmeans")
+
+#elbow method
+fviz_nbclust(wine_transform, kmeans, method="wss")
+
+#Silhouette method
+fviz_nbclust(wine_transform,kmeans,method="silhouette")
+
+#gap statistic method
+fviz_nbclust(wine_transform,kmeans,method="gap_stat")
 
 #kmeans clustering
-kmeans_wine_transform=kmeans(wine_transform,centers = 2,nstart = 10)
+kmeans_wine_transform<-kmeans(wine_transform,centers = 2,nstart = 10)
 kmeans_wine_transform
-fviz_cluster(kmeans_wine_transform,data=wine_transform[,1:2], geom = "point")
-
 
 wine_centers_pca<-kmeans_wine_transform$centers
 cat("\n Cluster Centers: \n")
@@ -182,6 +144,7 @@ wss_pca <- kmeans_wine_transform$tot.withinss
 cat("\n Within cluster sums of squares : \n")
 wss_pca
 
+#total sum of squares(TSS)
 tss_pca <- kmeans_wine_transform$totss
 cat("\n Total sum of squares: \n")
 tss_pca
@@ -189,15 +152,16 @@ tss_pca
 # Between-Cluster Sum of Squares (BSS)
 bss_pca <-kmeans_wine_transform$betweenss
 cat("\n Between-Cluster Sum of Squares: \n")
-bss_pca
+print(bss_pca)
 
 # Ratio of BSS/TSS
 bss_over_tss_pca <- bss_pca / tss_pca
 cat("\n Ratio between BSS/TSS: \n")
 bss_over_tss_pca
 
+
 #silhouette analysis
-silhouette_wine_pca<-silhouette(kmeans_wine_transform$cluster,dist(wine_subset)) 
+silhouette_wine_pca<-silhouette(kmeans_wine_transform$cluster,dist(wine_transform)) 
 #need to use $cluster because just kmeans give other info
 fviz_silhouette(silhouette_wine_pca)
 
